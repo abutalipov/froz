@@ -1,6 +1,7 @@
 <?php
 
 use Model\Boosterpack_model;
+use Model\Login_model;
 use Model\Post_model;
 use Model\User_model;
 
@@ -47,20 +48,17 @@ class Main_page extends MY_Controller
     {
         $login = $this->input->get_post('login');
         $password = $this->input->get_post('password');
-        $userModel = User_model::find_user_by_email($login);
-        if(!$userModel){
-            return 'error not found';
+        $userModel = Login_model::login($login,$password);
+        if (!$userModel){
+            return $this->response_error('Ошибка авторизации',[],403);
         }
-        if($userModel->get_password() !== $password){
-            return 'error invalid password';
-        }
-
         return $this->response_success(['user'=>User_model::preparation($userModel, 'default')]);
     }
 
     public function logout()
     {
-        // TODO: task 1, аутентификация
+        Login_model::logout();
+        return $this->response_success();
     }
 
     public function comment()
