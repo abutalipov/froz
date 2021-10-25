@@ -85,6 +85,18 @@ class Main_page extends MY_Controller
 
     public function like_comment(int $comment_id)
     {
+
+        $user = Login_model::authUser();
+        if (!$user){
+            return $this->response_error('Нет доступа',[],403);
+        }
+        $commentModel = new Comment_model($comment_id);
+        $result = $commentModel->increment_likes($user);
+        if ($result){
+            return $this->response_success();
+        }else{
+            return $this->response_error();
+        }
         // TODO: task 3, лайк комментария
     }
 
