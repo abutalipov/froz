@@ -347,7 +347,6 @@ class User_model extends Emerald_model {
     public static function find_user_by_email(string $email): User_model
     {
         return new self(App::get_s()->from(self::CLASS_TABLE)->where(['email' => $email])->one('id'));
-        // TODO: task 1, аутентификация
     }
 
     /**

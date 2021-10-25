@@ -19,11 +19,18 @@ class Login_model extends CI_Model {
         App::get_ci()->session->unset_userdata('id');
     }
 
+    public static function authUser(): ?User_model
+    {
+        $session_id = User_model::get_session_id();
+        if (intval($session_id))
+            return new User_model($session_id);
+        return null;
+    }
     /**
      * @return false|User_model|null
      * @throws Exception
      */
-    public static function login($login,$password)
+        public static function login($login,$password)
     {
         $userModel = User_model::find_user_by_email($login);
         if(!$userModel){

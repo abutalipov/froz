@@ -1,6 +1,7 @@
 <?php
 
 use Model\Boosterpack_model;
+use Model\Comment_model;
 use Model\Login_model;
 use Model\Post_model;
 use Model\User_model;
@@ -50,7 +51,7 @@ class Main_page extends MY_Controller
         $password = $this->input->get_post('password');
         $userModel = Login_model::login($login,$password);
         if (!$userModel){
-            return $this->response_error('Ошибка авторизации',[],403);
+            return $this->response_error('Ошибка авторизации',[],401);
         }
         return $this->response_success(['user'=>User_model::preparation($userModel, 'default')]);
     }
@@ -63,7 +64,23 @@ class Main_page extends MY_Controller
 
     public function comment()
     {
-        // TODO: task 2, комментирование
+        $user = Login_model::authUser();
+        if (!$user){
+            return $this->response_error('Нет доступа',[],403);
+        }
+        $assign_id=$this->input->get_post('assign_id');//todo добавить проверку поста
+        $reply_id=$this->input->get_post('reply_id');
+        $text=$this->input->get_post('text');
+        if (!intval($assign_id) or !trim($text)){
+            return $this->response_error('Ошибка валидации данных',[],400);
+        }
+        $create = ['user_id'=>$user->get_id(),'assign_id'=>$assign_id,'text'=>$text,'likes'=>0];
+        if($reply_id){//todo добавит проверку родителя
+            $create['reply_id']=$reply_id;
+        }
+        $comment = Comment_model::create($create);
+
+        return $this->response_success(['comment'=>Comment_model::preparation($comment, 'default')]);
     }
 
     public function like_comment(int $comment_id)

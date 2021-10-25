@@ -155,7 +155,7 @@ class Comment_model extends Emerald_Model {
     /**
      * @return Int
      */
-    public function get_reply_id(): int
+    public function get_reply_id(): ?int
     {
         return $this->reply_id;
     }
@@ -251,6 +251,7 @@ class Comment_model extends Emerald_Model {
     public static function get_all_by_replay_id(int $reply_id)
     {
         // TODO task 2, дополнительно, вложенность комментариев
+        //fixme зачем получать список если по тз только добавить ? думаю это ввод в заблуждение , это должна быть проверка наличия коммента с определенным айди
     }
 
     /**
