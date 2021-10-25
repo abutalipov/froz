@@ -45,9 +45,17 @@ class Main_page extends MY_Controller
 
     public function login()
     {
-        // TODO: task 1, аутентификация
+        $login = $this->input->get_post('login');
+        $password = $this->input->get_post('password');
+        $userModel = User_model::find_user_by_email($login);
+        if(!$userModel){
+            return 'error not found';
+        }
+        if($userModel->get_password() !== $password){
+            return 'error invalid password';
+        }
 
-        return $this->response_success();
+        return $this->response_success(['user'=>User_model::preparation($userModel, 'default')]);
     }
 
     public function logout()
