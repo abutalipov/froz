@@ -267,8 +267,30 @@ class User_model extends Emerald_model {
      */
     public function add_money(float $sum): bool
     {
-        // TODO: task 4, добавление денег
+        App::get_s()->set_transaction_repeatable_read()->execute();
+        App::get_s()->start_trans()->execute();
+        //начинаем транзакцию
+        $wallet_total_refilled = App::get_s()->from(self::get_table())
+            ->where(['id' => $this->get_id()])
+            ->update(sprintf('wallet_total_refilled = wallet_total_refilled + %s', App::get_s()->quote($sum)))
+            ->execute();
+        $wallet_balancet = App::get_s()->from(self::get_table())
+            ->where(['id' => $this->get_id()])
+            ->update(sprintf('wallet_balance = wallet_balance + %s', App::get_s()->quote($sum)))
+            ->execute();
 
+        $affected_bool =  App::get_s()->is_affected();
+        //если нет изменений то ролбэк , так как написано в доках
+        if (!$affected_bool){
+            App::get_s()->rollback()->execute();
+            return false;
+        }
+        //если один из запросов не свершился ролбэк
+        if (!$wallet_total_refilled or !$wallet_balancet){
+            App::get_s()->rollback()->execute();
+        } else {
+            App::get_s()->commit()->execute();
+        }
         return TRUE;
     }
 

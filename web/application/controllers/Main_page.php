@@ -115,14 +115,22 @@ class Main_page extends MY_Controller
 
     public function add_money()
     {
-        // TODO: task 4, пополнение баланса
-
+        $user = Login_model::authUser();
+        if (!$user){
+            return $this->response_error('Нет доступа',[],403);
+        }
         $sum = (float)App::get_ci()->input->post('sum');
-
+        $result = $user->add_money($sum);
+        if (!$result){
+            return $this->response_error('Ошибка пополнения',[],400);
+        }
+        return $this->response(['wallet_balance'=>$user->get_wallet_balance(),'wallet_total_refilled'=>$user->get_wallet_total_refilled()]);
     }
 
     public function get_post(int $post_id) {
+        return $this->response_success(['post'=>Post_model::preparation(new Post_model($post_id))]);
         // TODO получения поста по id
+        //fixme не знаю зачем это сделал
     }
 
     public function buy_boosterpack()
