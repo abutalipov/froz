@@ -245,7 +245,25 @@ class Comment_model extends Emerald_Model {
      */
     public function increment_likes(User_model $user): bool
     {
-        // TODO: task 3, лайк комментария
+        $like_balance = $user->get_likes_balance();
+        if ($like_balance<1){
+            return false;
+        }
+        $result = $user->decrement_likes();
+        if (!$result){
+            return false;
+        }
+        App::get_s()->from(self::get_table())
+            ->where(['id' => $this->get_id()])
+            ->update(sprintf('likes = likes + %s', App::get_s()->quote(1)))
+            ->execute();
+
+        if ( ! App::get_s()->is_affected())
+        {
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
     public static function get_all_by_replay_id(int $reply_id)

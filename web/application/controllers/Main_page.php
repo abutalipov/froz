@@ -85,7 +85,6 @@ class Main_page extends MY_Controller
 
     public function like_comment(int $comment_id)
     {
-
         $user = Login_model::authUser();
         if (!$user){
             return $this->response_error('Нет доступа',[],403);
@@ -95,14 +94,23 @@ class Main_page extends MY_Controller
         if ($result){
             return $this->response_success();
         }else{
-            return $this->response_error();
+            return $this->response_error('проверьте баланс');
         }
-        // TODO: task 3, лайк комментария
     }
 
     public function like_post(int $post_id)
     {
-        // TODO: task 3, лайк поста
+        $user = Login_model::authUser();
+        if (!$user){
+            return $this->response_error('Нет доступа',[],403);
+        }
+        $postModel = new Post_model($post_id);
+        $result = $postModel->increment_likes($user);
+        if ($result){
+            return $this->response_success();
+        }else{
+            return $this->response_error('проверьте баланс');
+        }
     }
 
     public function add_money()
